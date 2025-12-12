@@ -404,6 +404,10 @@ section.active {
 .resume-box .desc {
   margin: 2rem 0rem 2.5rem;
 }
+.resume-box li {
+  margin-bottom: 13px;
+  font-size: 15px;
+}
 
 .resume-box .resume-btn {
   width: 100%;
