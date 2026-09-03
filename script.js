@@ -85,34 +85,44 @@ let index = 0;
 const activePortfolio = () => {
   const imgSlide = document.querySelector(".img-slide");
   const portfolioDetails = document.querySelectorAll(".portofolio-details");
+  const slides = document.querySelectorAll(".portofolio-carousel .img-item");
+
   imgSlide.style.transform = `translateX(calc(${index * -100}% - ${
     index * 2
   }rem))`;
+
   portfolioDetails.forEach((detail) => {
     detail.classList.remove("active");
   });
-  portfolioDetails[index].classList.add("active");
+  if (portfolioDetails[index]) {
+    portfolioDetails[index].classList.add("active");
+  }
+
+  // Update arrow disabled classes cleanly
+  if (index === 0) {
+    arrowleft.classList.add("disabled");
+  } else {
+    arrowleft.classList.remove("disabled");
+  }
+
+  if (index === slides.length - 1) {
+    arrowright.classList.add("disabled");
+  } else {
+    arrowright.classList.remove("disabled");
+  }
 };
 
 arrowright.addEventListener("click", () => {
-  const imgs = document.querySelectorAll(".img-item");
-  if (index < imgs.length - 3) {
+  const slides = document.querySelectorAll(".portofolio-carousel .img-item");
+  if (index < slides.length - 1) {
     index++;
-    arrowleft.classList.remove("disabled");
-  } else {
-    index = imgs.length - 2;
-    arrowright.classList.add("disabled");
+    activePortfolio();
   }
-  activePortfolio();
 });
 
 arrowleft.addEventListener("click", () => {
-  if (index > 1) {
+  if (index > 0) {
     index--;
-    arrowright.classList.remove("disabled");
-  } else {
-    index = 0;
-    arrowleft.classList.add("disabled");
+    activePortfolio();
   }
-  activePortfolio();
 });

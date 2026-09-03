@@ -660,6 +660,7 @@ svg {
   height: 45rem;
   border-radius: 1rem;
   overflow: hidden;
+  background: transparent;
 }
 
 .portofolio-carousel .img-slide {
@@ -676,12 +677,14 @@ svg {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
 }
 
 .portofolio-carousel .img-item img {
   display: block;
   width: 100%;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
   border-radius: 1rem;
 }
 
