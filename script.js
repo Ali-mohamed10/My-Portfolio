@@ -221,6 +221,41 @@ if (reviewArrowLeft) {
   });
 }
 
+// Mobile Touch Swipe for Reviews Carousel
+const reviewCarouselEl = document.querySelector(".reviews-carousel");
+if (reviewCarouselEl) {
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  reviewCarouselEl.addEventListener(
+    "touchstart",
+    (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    },
+    { passive: true }
+  );
+
+  reviewCarouselEl.addEventListener(
+    "touchend",
+    (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 40) {
+        if (diff > 0 && reviewIndex < reviewSlides.length - 1) {
+          // Swipe Left -> Next
+          reviewIndex++;
+          updateReviewSlider();
+        } else if (diff < 0 && reviewIndex > 0) {
+          // Swipe Right -> Prev
+          reviewIndex--;
+          updateReviewSlider();
+        }
+      }
+    },
+    { passive: true }
+  );
+}
+
 // Ensure audio is unmuted on user interaction
 document.addEventListener("click", () => {
   const activeVideo = reviewSlides[reviewIndex]?.querySelector("video");
