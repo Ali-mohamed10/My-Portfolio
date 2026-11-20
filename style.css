@@ -1130,11 +1130,14 @@ svg {
 
 @media screen and (max-width: 768px) {
   .reviews-slider-box {
-    padding: 1.5rem;
+    padding: 1.5rem 1rem;
     max-width: 100%;
   }
   .reviews-carousel {
-    height: 34rem;
+    height: 46rem;
+  }
+  .review-slide-item .media-wrapper {
+    padding: 0.6rem;
   }
   .reviews-arrow-left,
   .reviews-arrow-right {
@@ -1150,7 +1153,7 @@ svg {
 
 @media screen and (max-width: 450px) {
   .reviews-carousel {
-    height: 28rem;
+    height: 42rem;
   }
   .reviews-navigation {
     gap: 1.5rem;
