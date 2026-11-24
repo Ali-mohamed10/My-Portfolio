@@ -1,6 +1,6 @@
 # Portfolio Website
 
-A personal portfolio website showcasing front-end development skills, projects, and experience.
+A personal portfolio website showcasing full stack development skills, projects, and experience.
 
 ![Screenshot of Portfolio](images/Screenshot.png)
 
