@@ -242,19 +242,25 @@ const updateReviewSlider = () => {
 
   reviewTrack.style.transform = `translateX(${reviewIndex * -100}%)`;
 
-  // Autoplay video with sound if current slide has one
-  const currentVideo = reviewSlides[reviewIndex].querySelector("video");
-  if (currentVideo) {
-    currentVideo.currentTime = 0;
-    currentVideo.muted = false;
-    currentVideo.volume = 1;
-    const playPromise = currentVideo.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Fallback for strict browser autoplay restriction before any user interaction
-        currentVideo.muted = true;
-        currentVideo.play().catch(() => {});
-      });
+  // Only autoplay video if reviews section is actually visible (or on standalone reviews.html)
+  const reviewsSection = document.querySelector("section.reviews");
+  const isReviewsVisible =
+    !reviewsSection || reviewsSection.classList.contains("active");
+
+  if (isReviewsVisible) {
+    const currentVideo = reviewSlides[reviewIndex].querySelector("video");
+    if (currentVideo) {
+      currentVideo.currentTime = 0;
+      currentVideo.muted = false;
+      currentVideo.volume = 1;
+      const playPromise = currentVideo.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Fallback for strict browser autoplay restriction before any user interaction
+          currentVideo.muted = true;
+          currentVideo.play().catch(() => {});
+        });
+      }
     }
   }
 
@@ -332,10 +338,15 @@ if (reviewCarouselEl) {
   );
 }
 
-// Ensure audio is unmuted on user interaction
+// Ensure audio is unmuted on user interaction only when reviews section is visible
 document.addEventListener("click", () => {
+  const reviewsSection = document.querySelector("section.reviews");
+  const isReviewsVisible =
+    !reviewsSection || reviewsSection.classList.contains("active");
+  if (!isReviewsVisible) return;
+
   const activeVideo = reviewSlides[reviewIndex]?.querySelector("video");
-  if (activeVideo && activeVideo.muted) {
+  if (activeVideo && activeVideo.muted && !activeVideo.paused) {
     activeVideo.muted = false;
   }
 });
