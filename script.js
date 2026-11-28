@@ -11,61 +11,137 @@ if (menuIcon && navBar) {
   });
 }
 
+let sectionTimeout = null;
+let headerTimeout = null;
+let barsTimeout = null;
+
+const pauseAllReviewVideos = () => {
+  document.querySelectorAll(".reviews video").forEach((vid) => {
+    vid.pause();
+  });
+};
+
 const activePage = () => {
   const header = document.querySelector("header");
   const barsBox = document.querySelector(".bars-box");
-  header.classList.remove("active");
 
-  menuIcon.classList.remove("bx-x");
-  navBar.classList.remove("active");
+  if (sectionTimeout) clearTimeout(sectionTimeout);
+  if (headerTimeout) clearTimeout(headerTimeout);
+  if (barsTimeout) clearTimeout(barsTimeout);
 
-  setTimeout(() => {
-    header.classList.add("active");
+  pauseAllReviewVideos();
+
+  if (header) header.classList.remove("active");
+  if (menuIcon) menuIcon.classList.remove("bx-x");
+  if (navBar) navBar.classList.remove("active");
+
+  headerTimeout = setTimeout(() => {
+    if (header) header.classList.add("active");
   }, 1100);
+
   navLinks.forEach((link) => {
     link.classList.remove("active");
   });
-  barsBox.classList.remove("active");
 
-  setTimeout(() => {
-    barsBox.classList.add("active");
-  }, 1100);
+  if (barsBox) {
+    barsBox.classList.remove("active");
+    barsTimeout = setTimeout(() => {
+      barsBox.classList.add("active");
+    }, 1100);
+  }
 
   sections.forEach((section) => {
     section.classList.remove("active");
   });
 };
 
-navLinks.forEach((link, idx) => {
-  link.addEventListener("click", () => {
-    if (!link.classList.contains("active")) {
-      activePage();
-      link.classList.add("active");
-      setTimeout(() => {
-        if (sections[idx]) {
-          sections[idx].classList.add("active");
-          if (sections[idx].classList.contains("reviews") && typeof updateReviewSlider === "function") {
-            updateReviewSlider();
-          }
-        }
-      }, 1100);
+const getSectionIndexFromHash = (hash) => {
+  if (!hash || hash === "#") return 0;
+  const cleanHash = hash.toLowerCase();
+  for (let i = 0; i < navLinks.length; i++) {
+    if (navLinks[i].getAttribute("href")?.toLowerCase() === cleanHash) {
+      return i;
     }
+  }
+  return 0;
+};
+
+const navigateToSection = (idx, updateHistory = true, immediate = false) => {
+  if (idx < 0 || idx >= sections.length || !navLinks[idx]) return;
+
+  const targetHash = navLinks[idx].getAttribute("href") || "#home";
+  if (updateHistory && window.location.hash !== targetHash) {
+    history.pushState(null, "", targetHash);
+  }
+
+  if (immediate) {
+    navLinks.forEach((link) => link.classList.remove("active"));
+    sections.forEach((section) => section.classList.remove("active"));
+    navLinks[idx].classList.add("active");
+    sections[idx].classList.add("active");
+    if (
+      sections[idx].classList.contains("reviews") &&
+      typeof updateReviewSlider === "function"
+    ) {
+      updateReviewSlider();
+    }
+    return;
+  }
+
+  if (!navLinks[idx].classList.contains("active")) {
+    activePage();
+    navLinks[idx].classList.add("active");
+    sectionTimeout = setTimeout(() => {
+      if (sections[idx]) {
+        sections[idx].classList.add("active");
+        if (
+          sections[idx].classList.contains("reviews") &&
+          typeof updateReviewSlider === "function"
+        ) {
+          updateReviewSlider();
+        }
+      }
+    }, 1100);
+  }
+};
+
+navLinks.forEach((link, idx) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigateToSection(idx, true, false);
   });
 });
 
 const logo = document.querySelector("header .logo");
 if (logo && navLinks.length > 0) {
-  logo.addEventListener("click", () => {
-    if (!navLinks[0].classList.contains("active")) {
-      activePage();
-      navLinks[0].classList.add("active");
-
-      setTimeout(() => {
-        if (sections[0]) sections[0].classList.add("active");
-      }, 1100);
-    }
+  logo.addEventListener("click", (e) => {
+    e.preventDefault();
+    navigateToSection(0, true, false);
   });
 }
+
+// Sync section with URL hash on initial load and browser back/forward
+window.addEventListener("DOMContentLoaded", () => {
+  const initialHash = window.location.hash;
+  if (initialHash && initialHash !== "#") {
+    const idx = getSectionIndexFromHash(initialHash);
+    navigateToSection(idx, false, true);
+  } else if (
+    navLinks.length > 0 &&
+    (window.location.pathname.endsWith("index.html") ||
+      window.location.pathname === "/")
+  ) {
+    history.replaceState(null, "", "#home");
+  }
+});
+
+const syncSectionFromUrl = () => {
+  const idx = getSectionIndexFromHash(window.location.hash);
+  navigateToSection(idx, false, false);
+};
+
+window.addEventListener("hashchange", syncSectionFromUrl);
+window.addEventListener("popstate", syncSectionFromUrl);
 
 resumeBtns.forEach((btn, idx) => {
   btn.addEventListener("click", () => {
